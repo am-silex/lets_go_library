@@ -36,14 +36,17 @@ There are 2 entities:
 ## Installing
 
 This application is packed as 2 docker containers, so, 
-building and installation is straightforward
-1. clone repository
+building and installation is straightforward 
+
+clone repository
 
 `git clone git@github.com:am-silex/lets_go_library.git`
-2. build images and compile app
+
+build images and compile app
 
 `docker-compose -f .\compose.yaml up --no-start`
-3. start new containers
+
+start new containers
 
 `docker-compose -f .\compose.yaml start`
 
