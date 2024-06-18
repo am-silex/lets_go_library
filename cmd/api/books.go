@@ -26,7 +26,7 @@ func (app *application) createBookHandler(w http.ResponseWriter, r *http.Request
 		ISBN:     inputData.ISBN,
 	}
 
-	err = app.models.Books.Insert(book)
+	err = app.models.Books.Insert(book, nil)
 	if err != nil {
 		app.logger.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -64,7 +64,7 @@ func (app *application) updateBookHandler(w http.ResponseWriter, r *http.Request
 		ISBN:     inputData.ISBN,
 	}
 
-	err = app.models.Books.Update(book)
+	err = app.models.Books.Update(book, nil)
 	if err != nil {
 		app.logger.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -88,7 +88,7 @@ func (app *application) deleteBookHandler(w http.ResponseWriter, r *http.Request
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = app.models.Books.Delete(id)
+	err = app.models.Books.Delete(id, nil)
 	if err != nil {
 		app.logger.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)

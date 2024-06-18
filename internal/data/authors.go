@@ -18,12 +18,11 @@ type Author struct {
 // AuthorModel Define a struct type which wraps a sql.DB connection pool.
 type AuthorModel struct {
 	DB *sql.DB
-	Tx *sql.Tx
 }
 
 // Insert The method accepts a pointer to a author struct, which should contain
 // the data for the new record.
-func (m AuthorModel) Insert(author *Author) error {
+func (m AuthorModel) Insert(author *Author, tx *sql.Tx) error {
 	query := `
 		INSERT INTO public.authors (first_name, last_name, bio, date_of_birth)
 		VALUES ($1, $2, $3, $4)
@@ -34,7 +33,13 @@ func (m AuthorModel) Insert(author *Author) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	return m.DB.QueryRowContext(ctx, query, args...).Scan(&author.ID)
+	switch tx {
+	case nil:
+		return m.DB.QueryRowContext(ctx, query, args...).Scan(&author.ID)
+	default:
+		return tx.QueryRowContext(ctx, query, args...).Scan(&author.ID)
+	}
+
 }
 
 // Get fetches a specific record from the authors table.
@@ -75,7 +80,7 @@ func (m AuthorModel) Get(id int64) (*Author, error) {
 }
 
 // Update updates a specific record in the authors table.
-func (m AuthorModel) Update(author *Author) error {
+func (m AuthorModel) Update(author *Author, tx *sql.Tx) error {
 	query := `
         UPDATE public.authors
         SET first_name = $1, last_name = $2, bio = $3, date_of_birth = $4
@@ -93,14 +98,14 @@ func (m AuthorModel) Update(author *Author) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	switch m.Tx {
+	switch tx {
 	case nil:
 		err := m.DB.QueryRowContext(ctx, query, args...).Scan(&author.ID)
 		if err != nil {
 			return err
 		}
 	default:
-		err := m.Tx.QueryRowContext(ctx, query, args...).Scan(&author.ID)
+		err := tx.QueryRowContext(ctx, query, args...).Scan(&author.ID)
 		if err != nil {
 			return err
 		}
@@ -110,7 +115,7 @@ func (m AuthorModel) Update(author *Author) error {
 }
 
 // Delete deletes a specific record from the authors table.
-func (m AuthorModel) Delete(id int64) error {
+func (m AuthorModel) Delete(id int64, tx *sql.Tx) error {
 	if id < 1 {
 		return ErrRecordNotFound
 	}
@@ -122,18 +127,36 @@ func (m AuthorModel) Delete(id int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	result, err := m.DB.ExecContext(ctx, query, id)
-	if err != nil {
-		return err
-	}
+	switch tx {
+	case nil:
+		result, err := m.DB.ExecContext(ctx, query, id)
+		if err != nil {
+			return err
+		}
 
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			return err
+		}
 
-	if rowsAffected == 0 {
-		return ErrRecordNotFound
+		if rowsAffected == 0 {
+			return ErrRecordNotFound
+		}
+	default:
+		result, err := tx.ExecContext(ctx, query, id)
+		if err != nil {
+			return err
+		}
+
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			return err
+		}
+
+		if rowsAffected == 0 {
+			return ErrRecordNotFound
+		}
+
 	}
 
 	return nil

@@ -32,6 +32,22 @@ func (app *application) updateBookAndAuthorHandler(w http.ResponseWriter, r *htt
 		return
 	}
 
+	tx, err := app.models.Translations.Create()
+	defer func() {
+		if err == nil {
+			err = app.models.Translations.Commit(tx)
+			if err != nil {
+				app.logger.Println(err)
+			}
+		}
+		if err != nil {
+			err = app.models.Translations.Rollback(tx)
+			if err != nil {
+				app.logger.Println(err)
+			}
+		}
+	}()
+
 	author := &data.Author{
 		ID:          authorId,
 		FirstName:   inputData.Author.FirstName,
@@ -39,7 +55,7 @@ func (app *application) updateBookAndAuthorHandler(w http.ResponseWriter, r *htt
 		Bio:         inputData.Author.Bio,
 		DateOfBirth: inputData.Author.DateOfBirth,
 	}
-	err = app.models.Authors.Update(author)
+	err = app.models.Authors.Update(author, tx)
 	if err != nil {
 		app.logger.Println(err)
 		return
@@ -52,7 +68,7 @@ func (app *application) updateBookAndAuthorHandler(w http.ResponseWriter, r *htt
 		Year:     inputData.Book.Year,
 		ISBN:     inputData.Book.ISBN,
 	}
-	err = app.models.Books.Update(book)
+	err = app.models.Books.Update(book, tx)
 	if err != nil {
 		app.logger.Println(err)
 		return

@@ -26,7 +26,7 @@ func (app *application) createAuthorHandler(w http.ResponseWriter, r *http.Reque
 		DateOfBirth: inputData.DateOfBirth,
 	}
 
-	err = app.models.Authors.Insert(author)
+	err = app.models.Authors.Insert(author, nil)
 	if err != nil {
 		app.logger.Println(err)
 		w.WriteHeader(http.StatusNoContent)
@@ -63,7 +63,7 @@ func (app *application) updateAuthorHandler(w http.ResponseWriter, r *http.Reque
 		DateOfBirth: inputData.DateOfBirth,
 	}
 
-	err = app.models.Authors.Update(author)
+	err = app.models.Authors.Update(author, nil)
 	if err != nil {
 		app.logger.Println(err)
 		w.WriteHeader(http.StatusNotFound)
@@ -85,7 +85,7 @@ func (app *application) deleteAuthorHandler(w http.ResponseWriter, r *http.Reque
 	if err != nil || id < 1 {
 		return
 	}
-	err = app.models.Authors.Delete(id)
+	err = app.models.Authors.Delete(id, nil)
 	if err != nil {
 		app.logger.Println(err)
 		w.WriteHeader(http.StatusNoContent)

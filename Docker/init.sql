@@ -1,6 +1,7 @@
 create table public.books
 (
     id       serial,
+    title    varchar,
     authorid integer,
     year     integer,
     isbn     varchar
