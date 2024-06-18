@@ -1,4 +1,4 @@
-Overview
+## Overview
 
 This repository contains an example REST API application written in Go. It's a backend for
 a proverbial library app so often used for test projects. 
@@ -19,7 +19,7 @@ There are 2 entities:
 - Year - int
 - ISBN - string
 
-List of endpoints:
+###### List of endpoints:
 
 - POST/books — Add a new book
 - GET /books — Get all books
@@ -33,10 +33,18 @@ List of endpoints:
 - DELETE /authors/{id} — Delete author by ID
 - PUT /books/{book_id}/authors/{author_id} — update author and book in transaction
 
-Installing
+## Installing
 
 This application is packed as 2 docker containers, so, 
 building and installation is straightforward
-1. clone repo
+1. clone repository
 
-2.
+`git clone git@github.com:am-silex/lets_go_library.git`
+2. build images and compile app
+
+`docker-compose -f .\compose.yaml up --no-start`
+3. start new containers
+
+`docker-compose -f .\compose.yaml start`
+
+It's all. Now, REST API available at 8080 port.
