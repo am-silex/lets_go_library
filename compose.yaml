@@ -1,0 +1,15 @@
+services:
+  db:
+    build:
+      context: ./Docker
+      dockerfile: ./db.Dockerfile
+    ports:
+      - "5432:5432"
+  app:
+    build:
+      context: .
+      dockerfile: ./Docker/app.Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db

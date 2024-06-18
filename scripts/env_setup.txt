@@ -1,0 +1,1 @@
+[Environment]::SetEnvironmentVariable('DB_HOST','localhost'); [Environment]::SetEnvironmentVariable('DB_USER','postgres'); [Environment]::SetEnvironmentVariable('DB_PASS','postgres');; [Environment]::SetEnvironmentVariable('DB_PORT','5432'); [Environment]::SetEnvironmentVariable('WEB_PORT','8080'); [Environment]::SetEnvironmentVariable('DB_NAME','library')
